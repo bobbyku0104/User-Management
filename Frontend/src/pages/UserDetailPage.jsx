@@ -19,6 +19,18 @@ function UserDetailPage() {
     setLoading(true);
     setError(null);
     try {
+      // Try loading from local storage cache first
+      const cached = localStorage.getItem("users");
+      if (cached) {
+        const list = JSON.parse(cached);
+        const found = list.find((u) => String(u.id) === String(id));
+        if (found) {
+          setUser(found);
+          return;
+        }
+      }
+
+      // Fallback to API if not found in cache
       const data = await getUserById(id);
       setUser(data);
     } catch (err) {
@@ -102,9 +114,9 @@ function UserDetailPage() {
         <DetailCard title="EMAIL" value={user.email} />
         <DetailCard title="PHONE" value={user.phone} />
         <DetailCard title="WEBSITE" value={user.website} />
-        <DetailCard title="COMPANY" value="" />
-        <DetailCard title="CITY" value="" />
-        <DetailCard title="STREET" value="" />
+        <DetailCard title="COMPANY" value={user.company?.name} />
+        <DetailCard title="CITY" value={user.address?.city} />
+        <DetailCard title="STREET" value={user.address ? `${user.address.street}, ${user.address.suite}` : ""} />
       </div>
     </div>
   );
