@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import {FiPlus,FiEdit2,FiTrash2,FiEye,FiRefreshCw,FiAlertCircle } from "react-icons/fi";
-import { getUsers, deleteUser } from "../api/users";
+import { 
+  FiPlus, 
+  FiEdit2, 
+  FiTrash2, 
+  FiEye, 
+  FiRefreshCw, 
+  FiAlertCircle 
+} from "react-icons/fi";
+import { getUsers, deleteUser, createUser, updateUser } from "../api/users";
 import TableSkeleton from "../components/TableSkeleton";
+import Modal from "../components/Modal";
+import UserForm from "../components/UserForm";
 import { getInitials } from "../components/utils";
 
 function HomePage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -34,9 +47,15 @@ function HomePage() {
       return;
     }
 
-    const deletePromise = deleteUser(id).then(() => {
-      // Remove user from local state to update UI immediately
-      setUsers((prev) => prev.filter((user) => user.id !== id));
+    const previousUsers = [...users];
+
+    // Optimistically update UI instantly
+    setUsers((prev) => prev.filter((user) => user.id !== id));
+
+    const deletePromise = deleteUser(id).catch((err) => {
+      // Revert back if API fails
+      setUsers(previousUsers);
+      throw err;
     });
 
     toast.promise(deletePromise, {
@@ -46,7 +65,54 @@ function HomePage() {
     });
   };
 
-  // Dynamic avatar colors based on name length
+  const handleOpenCreateModal = () => {
+    setSelectedUser(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const handleFormSubmit = async (formData) => {
+    const isEdit = !!selectedUser;
+    const previousUsers = [...users];
+
+    // Create temporary UI data object
+    const tempId = isEdit ? selectedUser.id : Date.now();
+    const optimisticUser = { id: tempId, ...formData };
+
+    // Update UI instantly
+    if (isEdit) {
+      setUsers((prev) => 
+        prev.map((u) => (u.id === selectedUser.id ? optimisticUser : u))
+      );
+    } else {
+      setUsers((prev) => [optimisticUser, ...prev]);
+    }
+
+    // Close modal instantly
+    setIsModalOpen(false);
+
+    const apiCall = isEdit 
+      ? updateUser(selectedUser.id, formData)
+      : createUser(formData);
+
+    toast.promise(
+      apiCall.catch((err) => {
+        // Revert back if API fails
+        setUsers(previousUsers);
+        throw err;
+      }),
+      {
+        loading: isEdit ? "Updating user details..." : "Saving new user profile...",
+        success: isEdit ? "Profile updated successfully!" : "New user created successfully!",
+        error: "Failed to save user profile.",
+      }
+    );
+  };
+
   const getAvatarColor = (name) => {
     const colors = [
       "bg-red-100 text-red-700",
@@ -65,7 +131,7 @@ function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header section */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -77,7 +143,7 @@ function HomePage() {
         </div>
         
         <button
-          onClick={() => toast.success("Create user modal opens in next step!")}
+          onClick={handleOpenCreateModal}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 px-4.5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
         >
           <FiPlus className="w-5 h-5" />
@@ -92,7 +158,7 @@ function HomePage() {
         </div>
       ) : error ? (
         <div className="bg-red-50/50 border border-red-100 rounded-2xl p-8 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 mb-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-650 mb-4">
             <FiAlertCircle className="w-6 h-6" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900">Unable to load data</h3>
@@ -136,7 +202,6 @@ function HomePage() {
                             >
                               {user.name}
                             </Link>
-                            {/* Mobile responsive contact details */}
                             <div className="text-xs text-slate-500 mt-0.5 md:hidden space-y-0.5">
                               <div>{user.email}</div>
                               <div>{user.phone}</div>
@@ -164,7 +229,7 @@ function HomePage() {
                           </Link>
                           
                           <button
-                            onClick={() => toast.success("Edit user modal opens in next step!")}
+                            onClick={() => handleOpenEditModal(user)}
                             title="Edit User"
                             className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-amber-600 hover:border-amber-100 hover:bg-amber-50/20 transition-all"
                           >
@@ -188,6 +253,20 @@ function HomePage() {
           )}
         </div>
       )}
+
+      {/* Dynamic Create/Edit Modal popup */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={selectedUser ? "Edit User Profile" : "Create New User"}
+      >
+        <UserForm
+          initialData={selectedUser}
+          onSubmit={handleFormSubmit}
+          onCancel={() => setIsModalOpen(false)}
+          submitLabel={selectedUser ? "Update Profile" : "Create Profile"}
+        />
+      </Modal>
     </div>
   );
 }
