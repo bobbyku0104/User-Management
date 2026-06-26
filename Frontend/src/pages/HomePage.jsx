@@ -1,14 +1,78 @@
-import React from "react";
-import { FiPlus } from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { 
+  FiPlus, 
+  FiEdit2, 
+  FiTrash2, 
+  FiEye, 
+  FiRefreshCw, 
+  FiAlertCircle 
+} from "react-icons/fi";
+import { getUsers, deleteUser } from "../api/users";
+import TableSkeleton from "../components/TableSkeleton";
+import { getInitials } from "../components/utils";
 
-/**
- * HomePage Component
- * Renders the workspace dashboard containing the placeholder for user list.
- */
 function HomePage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getUsers();
+      setUsers(data);
+    } catch (err) {
+      setError("Failed to fetch users. Please check your connection.");
+      toast.error("Could not load users list.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete ${name}?`)) {
+      return;
+    }
+
+    const deletePromise = deleteUser(id).then(() => {
+      // Remove user from local state to update UI immediately
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+    });
+
+    toast.promise(deletePromise, {
+      loading: `Deleting ${name}...`,
+      success: `Successfully deleted ${name}`,
+      error: `Failed to delete ${name}.`,
+    });
+  };
+
+  // Dynamic avatar colors based on name length
+  const getAvatarColor = (name) => {
+    const colors = [
+      "bg-red-100 text-red-700",
+      "bg-orange-100 text-orange-700",
+      "bg-amber-100 text-amber-700",
+      "bg-emerald-100 text-emerald-700",
+      "bg-teal-100 text-teal-700",
+      "bg-blue-100 text-blue-700",
+      "bg-indigo-100 text-indigo-700",
+      "bg-violet-100 text-violet-700",
+      "bg-fuchsia-100 text-fuchsia-700",
+      "bg-pink-100 text-pink-700",
+    ];
+    return colors[name.length % colors.length];
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Page Header */}
+      {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -19,9 +83,8 @@ function HomePage() {
           </p>
         </div>
         
-        {/* Create User Button Placeholder */}
         <button
-          onClick={() => alert("Create user modal will open here soon!")}
+          onClick={() => toast.success("Create user modal opens in next step!")}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 px-4.5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
         >
           <FiPlus className="w-5 h-5" />
@@ -29,16 +92,109 @@ function HomePage() {
         </button>
       </div>
 
-      {/* Main Table Placeholder container */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-12 text-center">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-4 font-bold">
-          ℹ️
+      {/* Main dashboard content */}
+      {loading ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-6">
+          <TableSkeleton />
         </div>
-        <h3 className="text-lg font-semibold text-slate-950">No users listed yet</h3>
-        <p className="mt-2 text-sm text-slate-500 max-w-sm mx-auto">
-          In the next steps, we will connect the JSONPlaceholder API to fetch and display actual user records here in a responsive table.
-        </p>
-      </div>
+      ) : error ? (
+        <div className="bg-red-50/50 border border-red-100 rounded-2xl p-8 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 mb-4">
+            <FiAlertCircle className="w-6 h-6" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900">Unable to load data</h3>
+          <p className="mt-2 text-sm text-red-600/80">{error}</p>
+          <button
+            onClick={fetchUsers}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors shadow-sm"
+          >
+            <FiRefreshCw className="w-4 h-4" /> Try Again
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+          {users.length === 0 ? (
+            <div className="p-12 text-center text-slate-400">
+              No users found.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/50 border-b border-slate-100">
+                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Email</th>
+                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Phone</th>
+                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {users.map((user) => (
+                    <tr key={user.id} className="hover:bg-slate-50/40 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full font-bold text-sm flex items-center justify-center shrink-0 shadow-inner ${getAvatarColor(user.name)}`}>
+                            {getInitials(user.name)}
+                          </div>
+                          <div>
+                            <Link 
+                              to={`/users/${user.id}`} 
+                              className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+                            >
+                              {user.name}
+                            </Link>
+                            {/* Mobile responsive contact details */}
+                            <div className="text-xs text-slate-500 mt-0.5 md:hidden space-y-0.5">
+                              <div>{user.email}</div>
+                              <div>{user.phone}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4 hidden md:table-cell">
+                        <span className="text-slate-600 font-medium text-sm">{user.email}</span>
+                      </td>
+
+                      <td className="px-6 py-4 hidden md:table-cell">
+                        <span className="text-slate-600 text-sm font-mono">{user.phone}</span>
+                      </td>
+
+                      <td className="px-6 py-4 text-right">
+                        <div className="inline-flex items-center gap-1.5">
+                          <Link
+                            to={`/users/${user.id}`}
+                            title="View Details"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50/20 transition-all"
+                          >
+                            <FiEye className="w-4.5 h-4.5" />
+                          </Link>
+                          
+                          <button
+                            onClick={() => toast.success("Edit user modal opens in next step!")}
+                            title="Edit User"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-amber-600 hover:border-amber-100 hover:bg-amber-50/20 transition-all"
+                          >
+                            <FiEdit2 className="w-4.5 h-4.5" />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(user.id, user.name)}
+                            title="Delete User"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-red-600 hover:border-red-100 hover:bg-red-50/20 transition-all"
+                          >
+                            <FiTrash2 className="w-4.5 h-4.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

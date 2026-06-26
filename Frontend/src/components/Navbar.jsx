@@ -2,16 +2,11 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FiUsers, FiHome } from "react-icons/fi";
 
-/**
- * Navbar Component
- * Navigation header displayed at the top of every page.
- */
 function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo Brand section */}
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2.5 transition-transform hover:scale-102">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20">
@@ -22,7 +17,6 @@ function Navbar() {
               </span>
             </Link>
 
-            {/* Navigation links */}
             <nav className="hidden md:flex items-center gap-1">
               <NavLink
                 to="/"
@@ -41,7 +35,6 @@ function Navbar() {
             </nav>
           </div>
 
-          {/* Action / Profile Info */}
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-semibold text-slate-800">Admin Account</span>
