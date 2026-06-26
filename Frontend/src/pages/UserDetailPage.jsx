@@ -73,50 +73,88 @@ function UserDetailPage() {
     );
   }
 
-  // Small helper component to render visual detail cards
-  const DetailCard = ({ title, value }) => (
-    <div className="bg-white border border-slate-200/60 rounded-xl p-5 shadow-xs">
-      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{title}</span>
-      <span className="block text-sm font-semibold text-slate-850 break-words">{value || "—"}</span>
-    </div>
-  );
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Back to users navigation */}
       <div className="mb-6">
         <Link
           to="/"
-          className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-850 transition-colors"
+          className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors"
         >
           ← Back to users
         </Link>
       </div>
 
-      {/* Profile Header info */}
-      <div className="flex items-center gap-4 mb-10 mt-6">
-        {/* Teal circular initials avatar */}
-        <div className="w-16 h-16 rounded-full bg-teal-55/70 border border-teal-100/50 text-teal-700 font-bold flex items-center justify-center text-lg select-none">
-          {getInitials(user.name)}
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 leading-tight">
-            {user.name}
-          </h1>
-          <p className="text-sm text-slate-400 font-medium mt-0.5">
-            @{user.username || "user"}
-          </p>
-        </div>
-      </div>
+      {/* Simple but beautiful Card */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+        <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-slate-100">
+          
+          {/* Left Column: Profile Card summary */}
+          <div className="p-6 md:p-8 md:w-1/3 flex flex-col items-center text-center bg-teal-50/30">
+            <div className="w-20 h-20 rounded-full bg-teal-50 border border-teal-100 text-teal-700 font-bold flex items-center justify-center text-2xl select-none mb-4 shadow-xs shrink-0">
+              {getInitials(user.name)}
+            </div>
+            <h1 className="text-xl font-bold text-slate-900 leading-tight mb-1">
+              {user.name}
+            </h1>
+            <p className="text-sm text-slate-400 font-medium">
+              @{user.username || "user"}
+            </p>
+            {user.company?.name && (
+              <span className="mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-100/50">
+                {user.company.name}
+              </span>
+            )}
+          </div>
 
-      {/* Info Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        <DetailCard title="EMAIL" value={user.email} />
-        <DetailCard title="PHONE" value={user.phone} />
-        <DetailCard title="WEBSITE" value={user.website} />
-        <DetailCard title="COMPANY" value={user.company?.name} />
-        <DetailCard title="CITY" value={user.address?.city} />
-        <DetailCard title="STREET" value={user.address ? `${user.address.street}, ${user.address.suite}` : ""} />
+          {/* Right Column: Full Details */}
+          <div className="p-6 md:p-8 flex-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">Profile Details</h2>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8">
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Email Address</span>
+                <span className="text-sm font-semibold text-slate-800 break-all">{user.email || "—"}</span>
+              </div>
+
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Phone Number</span>
+                <span className="text-sm font-semibold text-slate-800">{user.phone || "—"}</span>
+              </div>
+
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Website</span>
+                {user.website ? (
+                  <a
+                    href={`https://${user.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-sm font-semibold text-teal-700 hover:underline"
+                  >
+                    {user.website}
+                  </a>
+                ) : (
+                  <span className="text-sm font-semibold text-slate-800">—</span>
+                )}
+              </div>
+
+              <div>
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Company</span>
+                <span className="text-sm font-semibold text-slate-800">{user.company?.name || "—"}</span>
+              </div>
+
+              <div className="sm:col-span-2">
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Address</span>
+                <span className="text-sm font-semibold text-slate-800">
+                  {user.address
+                    ? `${user.address.street}, ${user.address.suite}, ${user.address.city} (${user.address.zipcode})`
+                    : "—"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
