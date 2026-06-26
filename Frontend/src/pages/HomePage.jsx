@@ -2,10 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { 
-  FiPlus, 
-  FiEdit2, 
-  FiTrash2, 
-  FiEye, 
   FiRefreshCw, 
   FiAlertCircle 
 } from "react-icons/fi";
@@ -113,41 +109,24 @@ function HomePage() {
     );
   };
 
-  const getAvatarColor = (name) => {
-    const colors = [
-      "bg-red-100 text-red-700",
-      "bg-orange-100 text-orange-700",
-      "bg-amber-100 text-amber-700",
-      "bg-emerald-100 text-emerald-700",
-      "bg-teal-100 text-teal-700",
-      "bg-blue-100 text-blue-700",
-      "bg-indigo-100 text-indigo-700",
-      "bg-violet-100 text-violet-700",
-      "bg-fuchsia-100 text-fuchsia-700",
-      "bg-pink-100 text-pink-700",
-    ];
-    return colors[name.length % colors.length];
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+      {/* Title & Description Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-            User Workspace
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            Users
           </h1>
-          <p className="mt-2 text-slate-500">
-            Manage your profiles, create new records, or inspect existing details.
+          <p className="mt-1 text-slate-500 text-sm">
+            Manage your team — create, edit, and remove users.
           </p>
         </div>
         
         <button
           onClick={handleOpenCreateModal}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 px-4.5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-teal-800 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-teal-900 transition-colors"
         >
-          <FiPlus className="w-5 h-5" />
-          Create User
+          <span className="text-lg font-bold leading-none">+</span> New user
         </button>
       </div>
 
@@ -171,7 +150,7 @@ function HomePage() {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {users.length === 0 ? (
             <div className="p-12 text-center text-slate-400">
               No users found.
@@ -180,68 +159,69 @@ function HomePage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/50 border-b border-slate-100">
-                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
-                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Email</th>
-                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Phone</th>
-                    <th className="px-6 py-4.5 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+                  <tr className="bg-slate-50/50 border-b border-slate-200">
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Email</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 hidden md:table-cell">Phone</th>
+                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50/40 transition-colors">
+                    <tr key={user.id} className="hover:bg-slate-50/20 transition-colors">
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full font-bold text-sm flex items-center justify-center shrink-0 shadow-inner ${getAvatarColor(user.name)}`}>
+                        <div className="flex items-center gap-3.5">
+                          {/* Circle initial avatar */}
+                          <div className="w-10 h-10 rounded-full font-bold text-sm bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 border border-teal-100/50 select-none">
                             {getInitials(user.name)}
                           </div>
                           <div>
                             <Link 
                               to={`/users/${user.id}`} 
-                              className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+                              className="font-bold text-slate-900 hover:text-blue-650 transition-colors"
                             >
                               {user.name}
                             </Link>
-                            <div className="text-xs text-slate-500 mt-0.5 md:hidden space-y-0.5">
-                              <div>{user.email}</div>
-                              <div>{user.phone}</div>
+                            <div className="text-xs text-slate-400 mt-0.5 font-medium">
+                              {user.email}
+                            </div>
+                            {/* Mobile responsive phone block */}
+                            <div className="text-xs text-slate-400 mt-0.5 md:hidden">
+                              {user.phone}
                             </div>
                           </div>
                         </div>
                       </td>
 
                       <td className="px-6 py-4 hidden md:table-cell">
-                        <span className="text-slate-600 font-medium text-sm">{user.email}</span>
+                        <span className="text-slate-700 font-medium text-sm">{user.email}</span>
                       </td>
 
                       <td className="px-6 py-4 hidden md:table-cell">
-                        <span className="text-slate-600 text-sm font-mono">{user.phone}</span>
+                        <span className="text-slate-700 text-sm font-mono">{user.phone}</span>
                       </td>
 
                       <td className="px-6 py-4 text-right">
-                        <div className="inline-flex items-center gap-1.5">
+                        <div className="inline-flex items-center gap-2">
                           <Link
                             to={`/users/${user.id}`}
-                            title="View Details"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-blue-600 hover:border-blue-100 hover:bg-blue-50/20 transition-all"
+                            className="rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold px-3 py-1.5 transition-colors inline-block"
                           >
-                            <FiEye className="w-4.5 h-4.5" />
+                            View
                           </Link>
-                          
+
                           <button
                             onClick={() => handleOpenEditModal(user)}
-                            title="Edit User"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-amber-600 hover:border-amber-100 hover:bg-amber-50/20 transition-all"
+                            className="rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 text-xs font-semibold px-3 py-1.5 transition-colors"
                           >
-                            <FiEdit2 className="w-4.5 h-4.5" />
+                            Edit
                           </button>
 
                           <button
                             onClick={() => handleDelete(user.id, user.name)}
-                            title="Delete User"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-500 hover:text-red-600 hover:border-red-100 hover:bg-red-50/20 transition-all"
+                            className="rounded-lg border border-red-200 bg-white text-red-650 hover:bg-red-50 text-xs font-semibold px-3 py-1.5 transition-colors"
                           >
-                            <FiTrash2 className="w-4.5 h-4.5" />
+                            Delete
                           </button>
                         </div>
                       </td>

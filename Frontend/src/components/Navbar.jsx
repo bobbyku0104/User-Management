@@ -1,52 +1,40 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import { FiUsers, FiHome } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-100 bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2.5 transition-transform hover:scale-102">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20">
-                <FiUsers className="w-5 h-5" />
+          
+          {/* Left section: green badge + titles */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3">
+              {/* Green square logo badge */}
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-850 text-white font-extrabold text-lg select-none">
+                U
               </div>
-              <span className="text-xl font-bold tracking-tight bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                UserHub
-              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-lg font-bold text-slate-900 tracking-tight">
+                  User Management
+                </span>
+                <span className="hidden sm:inline text-sm text-slate-400 font-medium">
+                  JSONPlaceholder demo
+                </span>
+              </div>
             </Link>
-
-            <nav className="hidden md:flex items-center gap-1">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                    isActive
-                      ? "bg-blue-50/80 text-blue-600"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`
-                }
-              >
-                <FiHome className="w-4 h-4" />
-                Dashboard
-              </NavLink>
-            </nav>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-semibold text-slate-800">Admin Account</span>
-              <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                Connected
-              </span>
-            </div>
-            <div className="h-9 w-9 rounded-full bg-linear-to-tr from-blue-500 to-indigo-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
-              AD
-            </div>
+          {/* Right section: Blue Review Button */}
+          <div>
+            <button 
+              onClick={() => alert("Review action triggered")}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition-colors"
+            >
+              Review
+            </button>
           </div>
+
         </div>
       </div>
     </header>

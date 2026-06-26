@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { 
-  FiArrowLeft, 
-  FiMail, 
-  FiPhone, 
-  FiGlobe, 
-  FiBriefcase, 
-  FiMapPin, 
-  FiAlertCircle, 
-  FiRefreshCw 
-} from "react-icons/fi";
+import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { getUserById } from "../api/users";
 import { getInitials } from "../components/utils";
 
@@ -40,7 +31,7 @@ function UserDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
         <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
         <p className="text-slate-500 font-medium">Loading user details...</p>
       </div>
@@ -57,7 +48,7 @@ function UserDetailPage() {
         <p className="mt-2 text-sm text-red-655">{error || "User record not found."}</p>
         <div className="mt-6 flex items-center justify-center gap-4">
           <Link to="/" className="text-sm font-semibold text-blue-650 hover:underline">
-            Back to Dashboard
+            Back to users
           </Link>
           <button
             onClick={fetchUserDetail}
@@ -70,110 +61,50 @@ function UserDetailPage() {
     );
   }
 
+  // Small helper component to render visual detail cards
+  const DetailCard = ({ title, value }) => (
+    <div className="bg-white border border-slate-200/60 rounded-xl p-5 shadow-xs">
+      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{title}</span>
+      <span className="block text-sm font-semibold text-slate-850 break-words">{value || "—"}</span>
+    </div>
+  );
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Back navigation link */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Back to users navigation */}
       <div className="mb-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+          className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-850 transition-colors"
         >
-          <FiArrowLeft className="w-4 h-4" /> Back to Dashboard
+          ← Back to users
         </Link>
       </div>
 
-      {/* Main card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        {/* Color banner header block */}
-        <div className="h-32 bg-linear-to-r from-blue-600 to-indigo-600 flex items-end px-6 md:px-8 pb-4">
-          <div className="flex items-center gap-4 translate-y-10">
-            {/* User Initials Avatar badge */}
-            <div className="w-20 h-20 rounded-2xl bg-white p-1 shadow-md">
-              <div className="w-full h-full rounded-xl bg-blue-50 text-blue-700 text-2xl font-bold flex items-center justify-center">
-                {getInitials(user.name)}
-              </div>
-            </div>
-          </div>
+      {/* Profile Header info */}
+      <div className="flex items-center gap-4 mb-10 mt-6">
+        {/* Teal circular initials avatar */}
+        <div className="w-16 h-16 rounded-full bg-teal-55/70 border border-teal-100/50 text-teal-700 font-bold flex items-center justify-center text-lg select-none">
+          {getInitials(user.name)}
         </div>
-
-        {/* Profile identity info */}
-        <div className="pt-14 px-6 md:px-8 pb-6 border-b border-slate-100">
-          <h1 className="text-2xl font-extrabold text-slate-950">{user.name}</h1>
-          <p className="text-sm text-slate-500 font-medium">@{user.username}</p>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 leading-tight">
+            {user.name}
+          </h1>
+          <p className="text-sm text-slate-400 font-medium mt-0.5">
+            @{user.username || "user"}
+          </p>
         </div>
+      </div>
 
-        {/* Body detail cards */}
-        <div className="p-6 md:p-8 space-y-8">
-          {/* Section 1: Contact Details */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Contact Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3.5 p-4 rounded-xl bg-slate-50/50 border border-slate-100/50">
-                <FiMail className="w-4.5 h-4.5 text-blue-600 shrink-0" />
-                <div className="truncate">
-                  <p className="text-xs text-slate-400 font-semibold">Email</p>
-                  <p className="text-sm font-semibold text-slate-800 truncate">{user.email}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3.5 p-4 rounded-xl bg-slate-50/50 border border-slate-100/50">
-                <FiPhone className="w-4.5 h-4.5 text-blue-600 shrink-0" />
-                <div>
-                  <p className="text-xs text-slate-400 font-semibold">Phone</p>
-                  <p className="text-sm font-semibold text-slate-800">{user.phone}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3.5 p-4 rounded-xl bg-slate-50/50 border border-slate-100/50 md:col-span-2">
-                <FiGlobe className="w-4.5 h-4.5 text-blue-600 shrink-0" />
-                <div>
-                  <p className="text-xs text-slate-400 font-semibold">Website</p>
-                  <a
-                    href={`https://${user.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-semibold text-blue-650 hover:underline"
-                  >
-                    {user.website}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Company Details */}
-          {user.company && (
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Company Details</h3>
-              <div className="p-5 rounded-xl bg-slate-50/50 border border-slate-100/50 space-y-4">
-                <div className="flex items-start gap-3.5">
-                  <FiBriefcase className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">{user.company.name}</h4>
-                    <p className="text-xs text-slate-500 italic mt-0.5">"{user.company.catchPhrase}"</p>
-                    <p className="text-xs text-slate-400 font-medium mt-2">Core: {user.company.bs}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Section 3: Location Details */}
-          {user.address && (
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Office Location</h3>
-              <div className="flex items-start gap-3.5 p-5 rounded-xl bg-slate-50/50 border border-slate-100/50">
-                <FiMapPin className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">
-                    {user.address.suite}, {user.address.street}
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    {user.address.city}, {user.address.zipcode}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Info Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+        <DetailCard title="EMAIL" value={user.email} />
+        <DetailCard title="PHONE" value={user.phone} />
+        <DetailCard title="WEBSITE" value={user.website} />
+        <DetailCard title="COMPANY" value="" />
+        <DetailCard title="CITY" value="" />
+        <DetailCard title="STREET" value="" />
       </div>
     </div>
   );
