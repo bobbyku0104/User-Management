@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { 
-  FiPlus, 
-  FiEdit2, 
-  FiTrash2, 
-  FiEye, 
-  FiRefreshCw, 
-  FiAlertCircle 
-} from "react-icons/fi";
+import {FiPlus,FiEdit2,FiTrash2,FiEye,FiRefreshCw,FiAlertCircle } from "react-icons/fi";
 import { getUsers, deleteUser } from "../api/users";
 import TableSkeleton from "../components/TableSkeleton";
 import { getInitials } from "../components/utils";
