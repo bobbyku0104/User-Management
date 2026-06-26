@@ -7,11 +7,10 @@ function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           
-          {/* Left section: green badge + titles */}
+          {/* Logo badge and title */}
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
-              {/* Green square logo badge */}
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-850 text-white font-extrabold text-lg select-none">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-800 text-white font-extrabold text-lg select-none">
                 U
               </div>
               <div className="flex items-baseline gap-2">
@@ -25,14 +24,18 @@ function Navbar() {
             </Link>
           </div>
 
-          {/* Right section: Blue Review Button */}
-          <div>
-            <button 
-              onClick={() => alert("Review action triggered")}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition-colors"
-            >
-              Review
-            </button>
+          {/* Right section: Profile Account & Status indicator */}
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="text-xs font-semibold text-slate-800">Admin Account</span>
+              <span className="text-[10px] text-teal-600 font-semibold flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                Connected
+              </span>
+            </div>
+            <div className="h-9 w-9 rounded-full bg-linear-to-tr from-teal-800 to-emerald-600 text-white font-bold flex items-center justify-center text-xs shadow-xs select-none">
+              AD
+            </div>
           </div>
 
         </div>
