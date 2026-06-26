@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import { FiUsers, FiHome, FiTrendingUp } from "react-icons/fi";
+import { FiUsers, FiHome } from "react-icons/fi";
 
 /**
  * Navbar Component
